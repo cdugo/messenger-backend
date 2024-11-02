@@ -10,6 +10,7 @@ Rails.application.routes.draw do
     member do
       post 'join'
       delete 'leave'
+      patch 'transfer_ownership'
     end
   end
   resources :messages

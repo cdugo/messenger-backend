@@ -58,8 +58,16 @@ class ServersController < ApplicationController
   end
 
   def transfer_ownership
-    @server.owner = @current_user
-    render json: @server, status: :ok
+    new_owner = User.find(params[:owner_id])
+    
+    if !@server.users.include?(new_owner)
+      render json: { error: "User is not a member of this server" }, status: :unauthorized
+    else
+      @server.update(owner_id: new_owner.id)
+      render json: @server, status: :ok
+    end
+  rescue ActiveRecord::RecordNotFound
+    render json: { error: "User not found" }, status: :not_found
   end
 
   # DELETE /servers/1
@@ -75,7 +83,7 @@ class ServersController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def server_params
-      params.require(:server).permit(:name, :description, :user_id)
+      params.require(:server).permit(:name, :description, :user_id, :owner_id)
     end
 
     def can_edit_server?
