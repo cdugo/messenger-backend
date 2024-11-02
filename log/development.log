@@ -161,3 +161,399 @@ Migrating to AddDefaultValueToActiveUser (20241102190837)
   [1m[36mTRANSACTION (1.2ms)[0m  [1m[35mCOMMIT[0m
   [1m[35m (0.1ms)[0m  [1m[34mSELECT pg_advisory_unlock(236261448955884765)[0m
   [1m[36mActiveRecord::SchemaMigration Load (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Started POST "/servers" for ::1 at 2024-11-02 15:21:26 -0400
+  [1m[36mActiveRecord::SchemaMigration Load (1.0ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Processing by ServersController#create as */*
+  [1m[36mUser Load (0.7ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = $1 LIMIT $2[0m  [["id", 2], ["LIMIT", 1]]
+  ↳ app/controllers/application_controller.rb:8:in `set_current_user'
+Completed 400 Bad Request in 40ms (ActiveRecord: 11.7ms (1 query, 0 cached) | GC: 1.6ms)
+
+
+  
+ActionController::ParameterMissing (param is missing or the value is empty: server):
+  
+app/controllers/servers_controller.rb:49:in `server_params'
+app/controllers/servers_controller.rb:18:in `create'
+Started POST "/servers" for ::1 at 2024-11-02 15:22:13 -0400
+Processing by ServersController#create as */*
+  Parameters: {"server"=>{"name"=>"Carlo's Room", "description"=>"my first server"}}
+  [1m[36mUser Load (0.9ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = $1 LIMIT $2[0m  [["id", 2], ["LIMIT", 1]]
+  ↳ app/controllers/application_controller.rb:8:in `set_current_user'
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN[0m
+  ↳ app/controllers/servers_controller.rb:20:in `create'
+  [1m[36mServer Create (4.0ms)[0m  [1m[32mINSERT INTO "servers" ("name", "description", "created_at", "updated_at") VALUES ($1, $2, $3, $4) RETURNING "id"[0m  [["name", "Carlo's Room"], ["description", "my first server"], ["created_at", "2024-11-02 19:22:13.948429"], ["updated_at", "2024-11-02 19:22:13.948429"]]
+  ↳ app/controllers/servers_controller.rb:20:in `create'
+  [1m[36mTRANSACTION (0.3ms)[0m  [1m[35mCOMMIT[0m
+  ↳ app/controllers/servers_controller.rb:20:in `create'
+Completed 201 Created in 24ms (Views: 1.1ms | ActiveRecord: 10.8ms (2 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/servers/1" for ::1 at 2024-11-02 15:23:07 -0400
+Processing by ServersController#show as */*
+  Parameters: {"id"=>"1"}
+  [1m[36mUser Load (0.1ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = $1 LIMIT $2[0m  [["id", 2], ["LIMIT", 1]]
+  ↳ app/controllers/application_controller.rb:8:in `set_current_user'
+  [1m[36mServer Load (0.2ms)[0m  [1m[34mSELECT "servers".* FROM "servers" WHERE "servers"."id" = $1 LIMIT $2[0m  [["id", 1], ["LIMIT", 1]]
+  ↳ app/controllers/servers_controller.rb:44:in `set_server'
+  [1m[36mMessage Load (2.0ms)[0m  [1m[34mSELECT "messages".* FROM "messages" WHERE "messages"."server_id" = $1[0m  [["server_id", 1]]
+  ↳ app/controllers/servers_controller.rb:13:in `show'
+Completed 200 OK in 30ms (Views: 11.8ms | ActiveRecord: 11.9ms (3 queries, 0 cached) | GC: 0.5ms)
+
+
+Started GET "/servers/1" for ::1 at 2024-11-02 15:23:21 -0400
+Processing by ServersController#show as */*
+  Parameters: {"id"=>"1"}
+  [1m[36mUser Load (0.4ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = $1 LIMIT $2[0m  [["id", 2], ["LIMIT", 1]]
+  ↳ app/controllers/application_controller.rb:8:in `set_current_user'
+  [1m[36mServer Load (0.2ms)[0m  [1m[34mSELECT "servers".* FROM "servers" WHERE "servers"."id" = $1 LIMIT $2[0m  [["id", 1], ["LIMIT", 1]]
+  ↳ app/controllers/servers_controller.rb:44:in `set_server'
+  [1m[36mUser Load (2.1ms)[0m  [1m[34mSELECT "users".* FROM "users" INNER JOIN "server_members" ON "users"."id" = "server_members"."user_id" WHERE "server_members"."server_id" = $1[0m  [["server_id", 1]]
+  ↳ app/controllers/servers_controller.rb:13:in `show'
+Completed 200 OK in 25ms (Views: 6.4ms | ActiveRecord: 13.9ms (3 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/servers/1" for ::1 at 2024-11-02 15:23:28 -0400
+Processing by ServersController#show as */*
+  Parameters: {"id"=>"1"}
+  [1m[36mUser Load (0.3ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = $1 LIMIT $2[0m  [["id", 2], ["LIMIT", 1]]
+  ↳ app/controllers/application_controller.rb:8:in `set_current_user'
+  [1m[36mServer Load (0.5ms)[0m  [1m[34mSELECT "servers".* FROM "servers" WHERE "servers"."id" = $1 LIMIT $2[0m  [["id", 1], ["LIMIT", 1]]
+  ↳ app/controllers/servers_controller.rb:44:in `set_server'
+  [1m[36mUser Load (0.3ms)[0m  [1m[34mSELECT "users".* FROM "users" INNER JOIN "server_members" ON "users"."id" = "server_members"."user_id" WHERE "server_members"."server_id" = $1[0m  [["server_id", 1]]
+  ↳ app/controllers/servers_controller.rb:13:in `show'
+  [1m[36mMessage Load (0.2ms)[0m  [1m[34mSELECT "messages".* FROM "messages" WHERE "messages"."server_id" = $1[0m  [["server_id", 1]]
+  ↳ app/controllers/servers_controller.rb:13:in `show'
+Completed 200 OK in 24ms (Views: 5.8ms | ActiveRecord: 12.8ms (4 queries, 0 cached) | GC: 2.1ms)
+
+
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT pg_try_advisory_lock(236261448955884765)[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.5ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[36mActiveRecord::InternalMetadata Load (0.6ms)[0m  [1m[34mSELECT * FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = $1 ORDER BY "ar_internal_metadata"."key" ASC LIMIT 1[0m  [[nil, "environment"]]
+Migrating to AddOwnerIdToServers (20241102192653)
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (4.7ms)[0m  [1m[35mALTER TABLE "servers" ADD "owner_id_id" bigint NOT NULL[0m
+  [1m[35m (2.4ms)[0m  [1m[35mCREATE INDEX "index_servers_on_owner_id_id" ON "servers" ("owner_id_id")[0m
+  [1m[35m (2.7ms)[0m  [1m[35mALTER TABLE "servers" ADD CONSTRAINT "fk_rails_8e5466096a"
+FOREIGN KEY ("owner_id_id")
+  REFERENCES "users" ("id")
+[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.3ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20241102192653') RETURNING "version"[0m
+  [1m[36mTRANSACTION (2.5ms)[0m  [1m[35mCOMMIT[0m
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT pg_advisory_unlock(236261448955884765)[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Started GET "/servers/1" for ::1 at 2024-11-02 15:33:57 -0400
+  [1m[36mActiveRecord::SchemaMigration Load (0.7ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Processing by ServersController#show as */*
+  Parameters: {"id"=>"1"}
+  [1m[36mUser Load (0.5ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = $1 LIMIT $2[0m  [["id", 2], ["LIMIT", 1]]
+  ↳ app/controllers/application_controller.rb:8:in `set_current_user'
+  [1m[36mServer Load (0.3ms)[0m  [1m[34mSELECT "servers".* FROM "servers" WHERE "servers"."id" = $1 LIMIT $2[0m  [["id", 1], ["LIMIT", 1]]
+  ↳ app/controllers/servers_controller.rb:60:in `set_server'
+Completed 404 Not Found in 38ms (ActiveRecord: 17.4ms (2 queries, 0 cached) | GC: 1.2ms)
+
+
+  
+ActiveRecord::RecordNotFound (Couldn't find Server with 'id'=1):
+  
+app/controllers/servers_controller.rb:60:in `set_server'
+Started POST "/servers" for ::1 at 2024-11-02 15:34:00 -0400
+Processing by ServersController#create as */*
+  Parameters: {"server"=>{"name"=>"Carlo's Room", "description"=>"my first server"}}
+  [1m[36mUser Load (0.4ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = $1 LIMIT $2[0m  [["id", 2], ["LIMIT", 1]]
+  ↳ app/controllers/application_controller.rb:8:in `set_current_user'
+Completed 500 Internal Server Error in 31ms (ActiveRecord: 4.7ms (1 query, 0 cached) | GC: 0.0ms)
+
+
+  
+NoMethodError (undefined method `owner=' for #<Server id: nil, name: "Carlo's Room", description: "my first server", created_at: nil, updated_at: nil, owner_id_id: nil>):
+  
+app/controllers/servers_controller.rb:20:in `create'
+Started POST "/login" for ::1 at 2024-11-02 15:34:04 -0400
+Processing by SessionsController#create as */*
+  Parameters: {"username"=>"user1", "password"=>"[FILTERED]", "session"=>{"username"=>"user1", "password"=>"[FILTERED]"}}
+  [1m[36mUser Load (0.2ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = $1 LIMIT $2[0m  [["id", 2], ["LIMIT", 1]]
+  ↳ app/controllers/application_controller.rb:8:in `set_current_user'
+  [1m[36mUser Load (0.2ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."username" = $1 LIMIT $2[0m  [["username", "user1"], ["LIMIT", 1]]
+  ↳ app/controllers/sessions_controller.rb:3:in `create'
+Completed 401 Unauthorized in 6ms (Views: 0.2ms | ActiveRecord: 0.4ms (2 queries, 0 cached) | GC: 2.1ms)
+
+
+Started POST "/login" for ::1 at 2024-11-02 15:34:14 -0400
+Processing by SessionsController#create as */*
+  Parameters: {"username"=>"user2", "password"=>"[FILTERED]", "session"=>{"username"=>"user2", "password"=>"[FILTERED]"}}
+  [1m[36mUser Load (0.4ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = $1 LIMIT $2[0m  [["id", 2], ["LIMIT", 1]]
+  ↳ app/controllers/application_controller.rb:8:in `set_current_user'
+  [1m[36mUser Load (0.4ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."username" = $1 LIMIT $2[0m  [["username", "user2"], ["LIMIT", 1]]
+  ↳ app/controllers/sessions_controller.rb:3:in `create'
+Completed 201 Created in 281ms (Views: 0.2ms | ActiveRecord: 0.8ms (2 queries, 0 cached) | GC: 0.3ms)
+
+
+Started POST "/servers" for ::1 at 2024-11-02 15:34:52 -0400
+Processing by ServersController#create as */*
+  Parameters: {"server"=>{"name"=>"Carlo's Room", "description"=>"my first server"}}
+  [1m[36mUser Load (0.3ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = $1 LIMIT $2[0m  [["id", 2], ["LIMIT", 1]]
+  ↳ app/controllers/application_controller.rb:8:in `set_current_user'
+Completed 500 Internal Server Error in 3ms (ActiveRecord: 0.3ms (1 query, 0 cached) | GC: 0.0ms)
+
+
+  
+NoMethodError (undefined method `owner=' for #<Server id: nil, name: "Carlo's Room", description: "my first server", created_at: nil, updated_at: nil, owner_id_id: nil>):
+  
+app/controllers/servers_controller.rb:20:in `create'
+  [1m[36mActiveRecord::SchemaMigration Load (0.8ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[35m (0.7ms)[0m  [1m[34mSELECT pg_try_advisory_lock(236261448955884765)[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.4ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Migrating to AddOwnerIdToServers (20241102192653)
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (3.0ms)[0m  [1m[35mALTER TABLE "servers" DROP CONSTRAINT "fk_rails_8e5466096a"[0m
+  [1m[35m (0.3ms)[0m  [1m[35mALTER TABLE "servers" DROP COLUMN "owner_id_id"[0m
+  [1m[36mActiveRecord::SchemaMigration Destroy (0.4ms)[0m  [1m[31mDELETE FROM "schema_migrations" WHERE "schema_migrations"."version" = '20241102192653'[0m
+  [1m[36mTRANSACTION (6.1ms)[0m  [1m[35mCOMMIT[0m
+  [1m[35m (0.3ms)[0m  [1m[34mSELECT pg_advisory_unlock(236261448955884765)[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT pg_try_advisory_lock(236261448955884765)[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.7ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[36mActiveRecord::InternalMetadata Load (0.8ms)[0m  [1m[34mSELECT * FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = $1 ORDER BY "ar_internal_metadata"."key" ASC LIMIT 1[0m  [[nil, "environment"]]
+Migrating to AddOwnerIdToServers (20241102192653)
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN[0m
+  [1m[35m (1.1ms)[0m  [1m[35mALTER TABLE "servers" ADD "owner_id" bigint NOT NULL[0m
+  [1m[35m (2.1ms)[0m  [1m[35mCREATE INDEX "index_servers_on_owner_id" ON "servers" ("owner_id")[0m
+  [1m[35m (1.3ms)[0m  [1m[35mALTER TABLE "servers" ADD CONSTRAINT "fk_rails_09f4d3002e"
+FOREIGN KEY ("owner_id")
+  REFERENCES "users" ("id")
+[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.1ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20241102192653') RETURNING "version"[0m
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mCOMMIT[0m
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT pg_advisory_unlock(236261448955884765)[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Started POST "/servers" for ::1 at 2024-11-02 15:36:50 -0400
+  [1m[36mActiveRecord::SchemaMigration Load (0.8ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Processing by ServersController#create as */*
+  Parameters: {"server"=>{"name"=>"Carlo's Room", "description"=>"my first server"}}
+  [1m[36mUser Load (0.3ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = $1 LIMIT $2[0m  [["id", 2], ["LIMIT", 1]]
+  ↳ app/controllers/application_controller.rb:8:in `set_current_user'
+Completed 500 Internal Server Error in 32ms (ActiveRecord: 10.9ms (1 query, 0 cached) | GC: 1.4ms)
+
+
+  
+NoMethodError (undefined method `owner=' for #<Server id: nil, name: "Carlo's Room", description: "my first server", created_at: nil, updated_at: nil, owner_id: nil>):
+  
+app/controllers/servers_controller.rb:20:in `create'
+Started POST "/servers" for ::1 at 2024-11-02 15:37:55 -0400
+Processing by ServersController#create as */*
+  Parameters: {"server"=>{"name"=>"Carlo's Room", "description"=>"my first server"}}
+  [1m[36mUser Load (0.2ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = $1 LIMIT $2[0m  [["id", 2], ["LIMIT", 1]]
+  ↳ app/controllers/application_controller.rb:8:in `set_current_user'
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[35mBEGIN[0m
+  ↳ app/controllers/servers_controller.rb:22:in `create'
+  [1m[36mUser Exists? (0.5ms)[0m  [1m[34mSELECT 1 AS one FROM "users" WHERE "users"."email" = $1 AND "users"."id" != $2 LIMIT $3[0m  [["email", "[FILTERED]"], ["id", 2], ["LIMIT", 1]]
+  ↳ app/controllers/servers_controller.rb:22:in `create'
+  [1m[36mServer Create (1.4ms)[0m  [1m[32mINSERT INTO "servers" ("name", "description", "created_at", "updated_at", "owner_id") VALUES ($1, $2, $3, $4, $5) RETURNING "id"[0m  [["name", "Carlo's Room"], ["description", "my first server"], ["created_at", "2024-11-02 19:37:55.355479"], ["updated_at", "2024-11-02 19:37:55.355479"], ["owner_id", 2]]
+  ↳ app/controllers/servers_controller.rb:22:in `create'
+  [1m[36mServerMember Create (2.4ms)[0m  [1m[32mINSERT INTO "server_members" ("user_id", "server_id", "created_at", "updated_at") VALUES ($1, $2, $3, $4) RETURNING "id"[0m  [["user_id", 2], ["server_id", 2], ["created_at", "2024-11-02 19:37:55.357708"], ["updated_at", "2024-11-02 19:37:55.357708"]]
+  ↳ app/controllers/servers_controller.rb:22:in `create'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mCOMMIT[0m
+  ↳ app/controllers/servers_controller.rb:22:in `create'
+Completed 201 Created in 29ms (Views: 0.2ms | ActiveRecord: 19.5ms (4 queries, 0 cached) | GC: 0.5ms)
+
+
+Started POST "/servers/2/join" for ::1 at 2024-11-02 15:40:06 -0400
+Processing by ServersController#join as */*
+  Parameters: {"id"=>"2"}
+  [1m[36mUser Load (0.6ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = $1 LIMIT $2[0m  [["id", 2], ["LIMIT", 1]]
+  ↳ app/controllers/application_controller.rb:8:in `set_current_user'
+Completed 500 Internal Server Error in 10ms (ActiveRecord: 0.6ms (1 query, 0 cached) | GC: 0.0ms)
+
+
+  
+NoMethodError (undefined method `users' for nil:NilClass):
+  
+app/controllers/servers_controller.rb:39:in `join'
+Started POST "/servers/2/join" for ::1 at 2024-11-02 15:41:01 -0400
+Processing by ServersController#join as */*
+  Parameters: {"id"=>"2"}
+  [1m[36mUser Load (1.2ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = $1 LIMIT $2[0m  [["id", 2], ["LIMIT", 1]]
+  ↳ app/controllers/application_controller.rb:8:in `set_current_user'
+  [1m[36mServer Load (0.1ms)[0m  [1m[34mSELECT "servers".* FROM "servers" WHERE "servers"."id" = $1 LIMIT $2[0m  [["id", 2], ["LIMIT", 1]]
+  ↳ app/controllers/servers_controller.rb:60:in `set_server'
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN[0m
+  ↳ app/controllers/servers_controller.rb:39:in `join'
+  [1m[36mServerMember Create (1.0ms)[0m  [1m[32mINSERT INTO "server_members" ("user_id", "server_id", "created_at", "updated_at") VALUES ($1, $2, $3, $4) RETURNING "id"[0m  [["user_id", 2], ["server_id", 2], ["created_at", "2024-11-02 19:41:01.248672"], ["updated_at", "2024-11-02 19:41:01.248672"]]
+  ↳ app/controllers/servers_controller.rb:39:in `join'
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mROLLBACK[0m
+  ↳ app/controllers/servers_controller.rb:39:in `join'
+Completed 500 Internal Server Error in 24ms (ActiveRecord: 14.5ms (3 queries, 0 cached) | GC: 0.3ms)
+
+
+  
+ActiveRecord::RecordNotUnique (PG::UniqueViolation: ERROR:  duplicate key value violates unique constraint "index_server_members_on_user_id_and_server_id"
+DETAIL:  Key (user_id, server_id)=(2, 2) already exists.
+):
+
+Causes:
+PG::UniqueViolation (ERROR:  duplicate key value violates unique constraint "index_server_members_on_user_id_and_server_id"
+DETAIL:  Key (user_id, server_id)=(2, 2) already exists.
+)
+  
+Started POST "/servers/2/join" for ::1 at 2024-11-02 15:43:39 -0400
+Processing by ServersController#join as */*
+  Parameters: {"id"=>"2"}
+  [1m[36mUser Load (0.2ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = $1 LIMIT $2[0m  [["id", 2], ["LIMIT", 1]]
+  ↳ app/controllers/application_controller.rb:8:in `set_current_user'
+  [1m[36mServer Load (0.4ms)[0m  [1m[34mSELECT "servers".* FROM "servers" WHERE "servers"."id" = $1 LIMIT $2[0m  [["id", 2], ["LIMIT", 1]]
+  ↳ app/controllers/servers_controller.rb:67:in `set_server'
+  [1m[36mTRANSACTION (0.6ms)[0m  [1m[35mBEGIN[0m
+  ↳ app/controllers/servers_controller.rb:40:in `join'
+  [1m[36mServerMember Create (0.9ms)[0m  [1m[32mINSERT INTO "server_members" ("user_id", "server_id", "created_at", "updated_at") VALUES ($1, $2, $3, $4) RETURNING "id"[0m  [["user_id", 2], ["server_id", 2], ["created_at", "2024-11-02 19:43:39.463970"], ["updated_at", "2024-11-02 19:43:39.463970"]]
+  ↳ app/controllers/servers_controller.rb:40:in `join'
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[31mROLLBACK[0m
+  ↳ app/controllers/servers_controller.rb:40:in `join'
+Completed 422 Unprocessable Content in 26ms (Views: 0.1ms | ActiveRecord: 17.5ms (3 queries, 0 cached) | GC: 0.4ms)
+
+
+Started DELETE "/servers/2/leave" for ::1 at 2024-11-02 15:43:44 -0400
+Processing by ServersController#leave as */*
+  Parameters: {"id"=>"2"}
+  [1m[36mUser Load (0.5ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = $1 LIMIT $2[0m  [["id", 2], ["LIMIT", 1]]
+  ↳ app/controllers/application_controller.rb:8:in `set_current_user'
+  [1m[36mServer Load (0.2ms)[0m  [1m[34mSELECT "servers".* FROM "servers" WHERE "servers"."id" = $1 LIMIT $2[0m  [["id", 2], ["LIMIT", 1]]
+  ↳ app/controllers/servers_controller.rb:67:in `set_server'
+Completed 401 Unauthorized in 4ms (Views: 0.2ms | ActiveRecord: 0.6ms (2 queries, 0 cached) | GC: 0.0ms)
+
+
+Started POST "/signup" for ::1 at 2024-11-02 15:48:10 -0400
+Processing by UsersController#create as */*
+  Parameters: {"email"=>"[FILTERED]", "password"=>"[FILTERED]", "username"=>"user3", "user"=>{"username"=>"user3", "email"=>"[FILTERED]"}}
+  [1m[36mUser Load (0.3ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = $1 LIMIT $2[0m  [["id", 2], ["LIMIT", 1]]
+  ↳ app/controllers/application_controller.rb:8:in `set_current_user'
+[31mUnpermitted parameter: :user. Context: { controller: UsersController, action: create, request: #<ActionDispatch::Request:0x00000001083729f0>, params: {"email"=>"[FILTERED]", "password"=>"[FILTERED]", "username"=>"user3", "controller"=>"users", "action"=>"create", "user"=>{"username"=>"user3", "email"=>"[FILTERED]"}} }[0m
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN[0m
+  ↳ app/controllers/users_controller.rb:4:in `create'
+  [1m[36mUser Exists? (1.4ms)[0m  [1m[34mSELECT 1 AS one FROM "users" WHERE "users"."username" = $1 LIMIT $2[0m  [["username", "user3"], ["LIMIT", 1]]
+  ↳ app/controllers/users_controller.rb:4:in `create'
+  [1m[36mUser Exists? (0.3ms)[0m  [1m[34mSELECT 1 AS one FROM "users" WHERE "users"."email" = $1 LIMIT $2[0m  [["email", "[FILTERED]"], ["LIMIT", 1]]
+  ↳ app/controllers/users_controller.rb:4:in `create'
+  [1m[36mUser Create (2.2ms)[0m  [1m[32mINSERT INTO "users" ("username", "email", "is_active", "created_at", "updated_at", "password_digest") VALUES ($1, $2, $3, $4, $5, $6) RETURNING "id"[0m  [["username", "user3"], ["email", "[FILTERED]"], ["is_active", false], ["created_at", "2024-11-02 19:48:10.755244"], ["updated_at", "2024-11-02 19:48:10.755244"], ["password_digest", "[FILTERED]"]]
+  ↳ app/controllers/users_controller.rb:4:in `create'
+  [1m[36mTRANSACTION (2.4ms)[0m  [1m[35mCOMMIT[0m
+  ↳ app/controllers/users_controller.rb:4:in `create'
+Completed 201 Created in 257ms (Views: 0.1ms | ActiveRecord: 16.4ms (4 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/servers/1" for ::1 at 2024-11-02 15:49:11 -0400
+Processing by ServersController#show as */*
+  Parameters: {"id"=>"1"}
+  [1m[36mUser Load (0.2ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = $1 LIMIT $2[0m  [["id", 3], ["LIMIT", 1]]
+  ↳ app/controllers/application_controller.rb:8:in `set_current_user'
+  [1m[36mServer Load (0.2ms)[0m  [1m[34mSELECT "servers".* FROM "servers" WHERE "servers"."id" = $1 LIMIT $2[0m  [["id", 1], ["LIMIT", 1]]
+  ↳ app/controllers/servers_controller.rb:72:in `set_server'
+Completed 404 Not Found in 10ms (ActiveRecord: 5.3ms (2 queries, 0 cached) | GC: 0.0ms)
+
+
+  
+ActiveRecord::RecordNotFound (Couldn't find Server with 'id'=1):
+  
+app/controllers/servers_controller.rb:72:in `set_server'
+Started GET "/servers/2" for ::1 at 2024-11-02 15:49:16 -0400
+Processing by ServersController#show as */*
+  Parameters: {"id"=>"2"}
+  [1m[36mUser Load (0.4ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = $1 LIMIT $2[0m  [["id", 3], ["LIMIT", 1]]
+  ↳ app/controllers/application_controller.rb:8:in `set_current_user'
+  [1m[36mServer Load (0.3ms)[0m  [1m[34mSELECT "servers".* FROM "servers" WHERE "servers"."id" = $1 LIMIT $2[0m  [["id", 2], ["LIMIT", 1]]
+  ↳ app/controllers/servers_controller.rb:72:in `set_server'
+  [1m[36mUser Load (1.3ms)[0m  [1m[34mSELECT "users".* FROM "users" INNER JOIN "server_members" ON "users"."id" = "server_members"."user_id" WHERE "server_members"."server_id" = $1[0m  [["server_id", 2]]
+  ↳ app/controllers/servers_controller.rb:13:in `show'
+  [1m[36mMessage Load (0.7ms)[0m  [1m[34mSELECT "messages".* FROM "messages" WHERE "messages"."server_id" = $1[0m  [["server_id", 2]]
+  ↳ app/controllers/servers_controller.rb:13:in `show'
+Completed 200 OK in 37ms (Views: 19.2ms | ActiveRecord: 9.8ms (4 queries, 0 cached) | GC: 3.6ms)
+
+
+Started GET "/me" for ::1 at 2024-11-02 15:49:32 -0400
+Processing by UsersController#show as */*
+  [1m[36mUser Load (0.2ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = $1 LIMIT $2[0m  [["id", 3], ["LIMIT", 1]]
+  ↳ app/controllers/application_controller.rb:8:in `set_current_user'
+Completed 200 OK in 4ms (Views: 0.3ms | ActiveRecord: 0.2ms (1 query, 0 cached) | GC: 1.2ms)
+
+
+Started GET "/me" for ::1 at 2024-11-02 15:50:05 -0400
+Processing by UsersController#show as */*
+  [1m[36mUser Load (0.9ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = $1 LIMIT $2[0m  [["id", 3], ["LIMIT", 1]]
+  ↳ app/controllers/application_controller.rb:8:in `set_current_user'
+Completed 200 OK in 22ms (Views: 0.7ms | ActiveRecord: 12.4ms (1 query, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/me" for ::1 at 2024-11-02 15:50:17 -0400
+Processing by UsersController#show as */*
+  [1m[36mUser Load (0.1ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = $1 LIMIT $2[0m  [["id", 3], ["LIMIT", 1]]
+  ↳ app/controllers/application_controller.rb:8:in `set_current_user'
+Completed 200 OK in 6ms (Views: 0.1ms | ActiveRecord: 2.9ms (1 query, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/servers/2" for ::1 at 2024-11-02 15:50:22 -0400
+Processing by ServersController#show as */*
+  Parameters: {"id"=>"2"}
+  [1m[36mUser Load (0.2ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = $1 LIMIT $2[0m  [["id", 3], ["LIMIT", 1]]
+  ↳ app/controllers/application_controller.rb:8:in `set_current_user'
+  [1m[36mServer Load (0.2ms)[0m  [1m[34mSELECT "servers".* FROM "servers" WHERE "servers"."id" = $1 LIMIT $2[0m  [["id", 2], ["LIMIT", 1]]
+  ↳ app/controllers/servers_controller.rb:73:in `set_server'
+  [1m[36mUser Exists? (1.0ms)[0m  [1m[34mSELECT 1 AS one FROM "users" INNER JOIN "server_members" ON "users"."id" = "server_members"."user_id" WHERE "server_members"."server_id" = $1 AND "users"."id" = $2 LIMIT $3[0m  [["server_id", 2], ["id", 3], ["LIMIT", 1]]
+  ↳ app/controllers/servers_controller.rb:90:in `is_member_of_server?'
+Filter chain halted as :is_member_of_server? rendered or redirected
+Completed 401 Unauthorized in 20ms (Views: 0.3ms | ActiveRecord: 4.9ms (3 queries, 0 cached) | GC: 0.0ms)
+
+
+Started POST "/servers/2/join" for ::1 at 2024-11-02 15:51:08 -0400
+Processing by ServersController#join as */*
+  Parameters: {"id"=>"2"}
+  [1m[36mUser Load (0.5ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = $1 LIMIT $2[0m  [["id", 3], ["LIMIT", 1]]
+  ↳ app/controllers/application_controller.rb:8:in `set_current_user'
+  [1m[36mServer Load (0.3ms)[0m  [1m[34mSELECT "servers".* FROM "servers" WHERE "servers"."id" = $1 LIMIT $2[0m  [["id", 2], ["LIMIT", 1]]
+  ↳ app/controllers/servers_controller.rb:73:in `set_server'
+  [1m[36mUser Exists? (0.7ms)[0m  [1m[34mSELECT 1 AS one FROM "users" INNER JOIN "server_members" ON "users"."id" = "server_members"."user_id" WHERE "server_members"."server_id" = $1 AND "users"."id" = $2 LIMIT $3[0m  [["server_id", 2], ["id", 3], ["LIMIT", 1]]
+  ↳ app/controllers/servers_controller.rb:90:in `is_member_of_server?'
+Filter chain halted as :is_member_of_server? rendered or redirected
+Completed 401 Unauthorized in 26ms (Views: 0.5ms | ActiveRecord: 1.4ms (3 queries, 0 cached) | GC: 0.0ms)
+
+
+Started POST "/servers/2/join" for ::1 at 2024-11-02 15:51:17 -0400
+Processing by ServersController#join as */*
+  Parameters: {"id"=>"2"}
+  [1m[36mUser Load (0.1ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = $1 LIMIT $2[0m  [["id", 3], ["LIMIT", 1]]
+  ↳ app/controllers/application_controller.rb:8:in `set_current_user'
+  [1m[36mServer Load (0.1ms)[0m  [1m[34mSELECT "servers".* FROM "servers" WHERE "servers"."id" = $1 LIMIT $2[0m  [["id", 2], ["LIMIT", 1]]
+  ↳ app/controllers/servers_controller.rb:73:in `set_server'
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN[0m
+  ↳ app/controllers/servers_controller.rb:41:in `join'
+  [1m[36mServerMember Create (1.0ms)[0m  [1m[32mINSERT INTO "server_members" ("user_id", "server_id", "created_at", "updated_at") VALUES ($1, $2, $3, $4) RETURNING "id"[0m  [["user_id", 3], ["server_id", 2], ["created_at", "2024-11-02 19:51:17.684489"], ["updated_at", "2024-11-02 19:51:17.684489"]]
+  ↳ app/controllers/servers_controller.rb:41:in `join'
+  [1m[36mTRANSACTION (0.8ms)[0m  [1m[35mCOMMIT[0m
+  ↳ app/controllers/servers_controller.rb:41:in `join'
+  [1m[36mUser Load (0.4ms)[0m  [1m[34mSELECT "users".* FROM "users" INNER JOIN "server_members" ON "users"."id" = "server_members"."user_id" WHERE "server_members"."server_id" = $1[0m  [["server_id", 2]]
+  ↳ app/controllers/servers_controller.rb:42:in `join'
+Completed 201 Created in 24ms (Views: 0.9ms | ActiveRecord: 14.4ms (4 queries, 0 cached) | GC: 0.6ms)
+
+
+Started DELETE "/servers/2/leave" for ::1 at 2024-11-02 15:51:25 -0400
+Processing by ServersController#leave as */*
+  Parameters: {"id"=>"2"}
+  [1m[36mUser Load (0.2ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = $1 LIMIT $2[0m  [["id", 3], ["LIMIT", 1]]
+  ↳ app/controllers/application_controller.rb:8:in `set_current_user'
+  [1m[36mServer Load (0.1ms)[0m  [1m[34mSELECT "servers".* FROM "servers" WHERE "servers"."id" = $1 LIMIT $2[0m  [["id", 2], ["LIMIT", 1]]
+  ↳ app/controllers/servers_controller.rb:73:in `set_server'
+  [1m[36mUser Exists? (1.5ms)[0m  [1m[34mSELECT 1 AS one FROM "users" INNER JOIN "server_members" ON "users"."id" = "server_members"."user_id" WHERE "server_members"."server_id" = $1 AND "users"."id" = $2 LIMIT $3[0m  [["server_id", 2], ["id", 3], ["LIMIT", 1]]
+  ↳ app/controllers/servers_controller.rb:90:in `is_member_of_server?'
+  [1m[36mCACHE User Exists? (0.0ms)[0m  [1m[34mSELECT 1 AS one FROM "users" INNER JOIN "server_members" ON "users"."id" = "server_members"."user_id" WHERE "server_members"."server_id" = $1 AND "users"."id" = $2 LIMIT $3[0m  [["server_id", 2], ["id", 3], ["LIMIT", 1]]
+  ↳ app/controllers/servers_controller.rb:52:in `leave'
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN[0m
+  ↳ app/controllers/servers_controller.rb:55:in `leave'
+  [1m[36mServerMember Delete All (1.0ms)[0m  [1m[31mDELETE FROM "server_members" WHERE "server_members"."server_id" = $1 AND "server_members"."user_id" = $2[0m  [["server_id", 2], ["user_id", 3]]
+  ↳ app/controllers/servers_controller.rb:55:in `leave'
+  [1m[36mTRANSACTION (0.4ms)[0m  [1m[35mCOMMIT[0m
+  ↳ app/controllers/servers_controller.rb:55:in `leave'
+  [1m[36mUser Load (0.7ms)[0m  [1m[34mSELECT "users".* FROM "users" INNER JOIN "server_members" ON "users"."id" = "server_members"."user_id" WHERE "server_members"."server_id" = $1[0m  [["server_id", 2]]
+  ↳ app/controllers/servers_controller.rb:56:in `leave'
+Completed 200 OK in 15ms (Views: 2.1ms | ActiveRecord: 4.1ms (6 queries, 1 cached) | GC: 0.5ms)
+
+

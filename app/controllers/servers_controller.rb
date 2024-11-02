@@ -1,6 +1,7 @@
 class ServersController < ApplicationController
-  before_action :set_server, only: %i[ show update destroy ]
-
+  before_action :set_server, except: %i[ index create ]
+  before_action :can_edit_server?, only: %i[ update destroy transfer_ownership ]
+  before_action :is_member_of_server?, only: %i[ leave show]
   # GET /servers
   def index
     @servers = Server.all
@@ -10,15 +11,17 @@ class ServersController < ApplicationController
 
   # GET /servers/1
   def show
-    render json: @server
+    render json: @server, include: [:users, :messages]
   end
 
   # POST /servers
   def create
     @server = Server.new(server_params)
+    @server.users << @current_user
+    @server.owner_id = @current_user.id
 
     if @server.save
-      render json: @server, status: :created, location: @server
+      render json: @server, status: :created, include: :users
     else
       render json: @server.errors, status: :unprocessable_entity
     end
@@ -31,6 +34,32 @@ class ServersController < ApplicationController
     else
       render json: @server.errors, status: :unprocessable_entity
     end
+  end
+
+  def join
+    begin
+      @server.users << @current_user
+      render json: @server, status: :created, include: :users
+    rescue ActiveRecord::RecordNotUnique
+      render json: { error: "You are already a member of this server" }, status: :unprocessable_entity
+    end
+  end
+
+  def leave
+    if @server.owner_id == @current_user.id
+      render json: { error: "Cannot leave server that you own" }, status: :unauthorized
+
+    elsif !@server.users.include?(@current_user)
+      render json: { error: "You are not a member of this server" }, status: :unauthorized
+    else
+      @server.users.delete(@current_user)
+      render json: @server, status: :ok, include: :users
+    end
+  end
+
+  def transfer_ownership
+    @server.owner = @current_user
+    render json: @server, status: :ok
   end
 
   # DELETE /servers/1
@@ -47,5 +76,21 @@ class ServersController < ApplicationController
     # Only allow a list of trusted parameters through.
     def server_params
       params.require(:server).permit(:name, :description, :user_id)
+    end
+
+    def can_edit_server?
+      unless @server.owner_id == @current_user.id
+        render json: { error: "You don't have permission to modify this server" }, status: :unauthorized
+        return false
+      end
+      true
+    end
+
+    def is_member_of_server?
+      unless @server.users.include?(@current_user)
+        render json: { error: "You are not a member of this server" }, status: :unauthorized
+        return false
+      end
+      true
     end
 end

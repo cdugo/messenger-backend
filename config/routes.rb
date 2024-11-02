@@ -6,7 +6,12 @@ Rails.application.routes.draw do
   get '/me', to: 'users#show'
 
   # Other routes
-  resources :servers
+  resources :servers do
+    member do
+      post 'join'
+      delete 'leave'
+    end
+  end
   resources :messages
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
