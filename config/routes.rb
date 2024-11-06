@@ -12,8 +12,10 @@ Rails.application.routes.draw do
       delete 'leave'
       patch 'transfer_ownership'
     end
+    resources :messages
   end
-  resources :messages
+
+  mount ActionCable.server => '/cable'
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

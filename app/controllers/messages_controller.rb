@@ -1,51 +1,36 @@
 class MessagesController < ApplicationController
-  before_action :set_message, only: %i[ show update destroy ]
+  before_action :set_server
+  before_action :is_member_of_server?
+  before_action :can_modify_message?, only: [:update, :destroy]
 
-  # GET /messages
   def index
-    @messages = Message.all
-
-    render json: @messages
-  end
-
-  # GET /messages/1
-  def show
-    render json: @message
-  end
-
-  # POST /messages
-  def create
-    @message = Message.new(message_params)
-
-    if @message.save
-      render json: @message, status: :created, location: @message
-    else
-      render json: @message.errors, status: :unprocessable_entity
-    end
-  end
-
-  # PATCH/PUT /messages/1
-  def update
-    if @message.update(message_params)
-      render json: @message
-    else
-      render json: @message.errors, status: :unprocessable_entity
-    end
-  end
-
-  # DELETE /messages/1
-  def destroy
-    @message.destroy!
+    @messages = @server.messages.includes(:user, :replies)
+    render json: @messages, include: [:user, :replies]
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_message
-      @message = Message.find(params[:id])
-    end
 
-    # Only allow a list of trusted parameters through.
-    def message_params
-      params.require(:message).permit(:content, :user_id, :server_id, :message_id)
+  def set_server
+    @server = Server.find(params[:server_id])
+  end
+
+  def message_params
+    params.require(:message).permit(:content, :parent_message_id)
+  end
+
+  def can_modify_message?
+    unless @message.user_id == @current_user.id
+      render json: { message: "You don't have permission to modify this message" }, status: :unauthorized
+      return false
     end
+    true
+  end
+
+  def is_member_of_server?
+    unless @server.users.include?(@current_user)
+      render json: { message: "You are not a member of this server" }, status: :unauthorized
+      return false
+    end
+    true
+  end
 end
