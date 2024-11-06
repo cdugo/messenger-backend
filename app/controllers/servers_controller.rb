@@ -5,6 +5,7 @@ class ServersController < ApplicationController
   # GET /servers
   def index
     @servers = Server.all
+    
 
     render json: @servers
   end
@@ -41,16 +42,16 @@ class ServersController < ApplicationController
       @server.users << @current_user
       render json: @server, status: :created, include: :users
     rescue ActiveRecord::RecordNotUnique
-      render json: { error: "You are already a member of this server" }, status: :unprocessable_entity
+      render json: { message: "You are already a member of this server" }, status: :unprocessable_entity
     end
   end
 
   def leave
     if @server.owner_id == @current_user.id
-      render json: { error: "Cannot leave server that you own" }, status: :unauthorized
+      render json: { message: "Cannot leave server that you own" }, status: :unauthorized
 
     elsif !@server.users.include?(@current_user)
-      render json: { error: "You are not a member of this server" }, status: :unauthorized
+      render json: { message: "You are not a member of this server" }, status: :unauthorized
     else
       @server.users.delete(@current_user)
       render json: @server, status: :ok, include: :users
@@ -61,13 +62,13 @@ class ServersController < ApplicationController
     new_owner = User.find(params[:owner_id])
     
     if !@server.users.include?(new_owner)
-      render json: { error: "User is not a member of this server" }, status: :unauthorized
+      render json: { message: "User is not a member of this server" }, status: :unauthorized
     else
       @server.update(owner_id: new_owner.id)
       render json: @server, status: :ok
     end
   rescue ActiveRecord::RecordNotFound
-    render json: { error: "User not found" }, status: :not_found
+    render json: { message: "User not found" }, status: :not_found
   end
 
   # DELETE /servers/1
@@ -88,7 +89,7 @@ class ServersController < ApplicationController
 
     def can_edit_server?
       unless @server.owner_id == @current_user.id
-        render json: { error: "You don't have permission to modify this server" }, status: :unauthorized
+        render json: { message: "You don't have permission to modify this server" }, status: :unauthorized
         return false
       end
       true
@@ -96,7 +97,7 @@ class ServersController < ApplicationController
 
     def is_member_of_server?
       unless @server.users.include?(@current_user)
-        render json: { error: "You are not a member of this server" }, status: :unauthorized
+        render json: { message: "You are not a member of this server" }, status: :unauthorized
         return false
       end
       true

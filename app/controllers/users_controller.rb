@@ -11,9 +11,9 @@ class UsersController < ApplicationController
 
   def show
     if @current_user
-      render json: @current_user
+      render json: @current_user, include: [:servers]
     else
-      render json: { error: "Not authorized" }, status: :unauthorized
+      render json: { message: "Not authorized" }, status: :unauthorized
     end
   end
 
