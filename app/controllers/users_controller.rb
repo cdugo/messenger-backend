@@ -11,7 +11,16 @@ class UsersController < ApplicationController
 
   def show
     if @current_user
-      render json: @current_user, include: [:servers]
+      servers_with_messages = @current_user.servers.map do |server|
+        server.as_json.merge(
+          latest_message: server.messages.order(created_at: :desc).first&.as_json(include: { user: { only: :username } })
+        )
+      end
+      
+      render json: {
+        user: @current_user,
+        servers: servers_with_messages
+      }
     else
       render json: { message: "Not authorized" }, status: :unauthorized
     end
