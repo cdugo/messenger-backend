@@ -4,8 +4,8 @@ class MessagesController < ApplicationController
   before_action :can_modify_message?, only: [:update, :destroy]
 
   def index
-    @messages = @server.messages.includes(:user, :replies)
-    render json: @messages, include: [:user, :replies]
+    @messages = @server.messages.includes(:user, :replies, :reactions)
+    render json: @messages, include: [:user, :replies, :reactions]
   end
 
   private
@@ -33,4 +33,9 @@ class MessagesController < ApplicationController
     end
     true
   end
+
+  def set_message
+    @message = Message.find(params[:id])
+  end
+
 end
