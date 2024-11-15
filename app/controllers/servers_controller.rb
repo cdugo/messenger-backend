@@ -12,7 +12,7 @@ class ServersController < ApplicationController
 
   # GET /servers/1
   def show
-    render json: @server, include: { users: {}, messages: { include: :user } }
+    render json: @server, include: { users: {}, messages: { include: { user: {}, reactions: { include: { user: { only: :username } } } } } }
   end
 
   # POST /servers
