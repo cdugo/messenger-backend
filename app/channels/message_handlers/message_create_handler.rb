@@ -1,18 +1,34 @@
 module MessageHandlers
   class MessageCreateHandler < BaseHandler
     def call
-      message = Message.new(
+      message = Message.create!(
         content: data['content'],
         user: current_user,
-        server: server,
+        server_id: data['server_id'],
         parent_message_id: data['parent_message_id']
       )
 
-      if message.save
-        broadcast_message(message)
-      else
-        deliver_error_message(message)
-      end
+      # Broadcast the message to the message channel
+      broadcast_message(message)
+
+      # Broadcast notification using the channel directly
+      NotificationChannel.broadcast_to_server(
+        message.server_id,
+        'new_message',
+        {
+          message_id: message.id,
+          server_id: message.server_id,
+          sender: {
+            id: message.user.id,
+            username: message.user.username
+          },
+          preview: message.content.truncate(50),
+          timestamp: message.created_at
+        }
+      )
+
+    rescue ActiveRecord::RecordInvalid => e
+      error_response(e.message)
     end
 
     private
