@@ -12,7 +12,7 @@ Rails.application.routes.draw do
       delete 'leave'
       patch 'transfer_ownership'
     end
-    resources :messages
+    resources :messages, only: [:index]
   end
 
   mount ActionCable.server => '/cable'
