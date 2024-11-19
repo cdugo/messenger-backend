@@ -1,29 +1,36 @@
 class MessagesController < ApplicationController
+  include MessageSerialization
   before_action :set_server
   before_action :is_member_of_server?
-  before_action :can_modify_message?, only: [:update, :destroy]
 
+  # GET /servers/:server_id/messages
   def index
-    @messages = @server.messages.includes(:user, :replies, :reactions)
-    render json: @messages, include: [:user, :replies, :reactions]
+
+    @messages = @server.messages
+                      .includes(:user, reactions: { user: {} })
+                      .order(created_at: :desc)
+                      .page(params[:page])
+                      .per(Pagination::DEFAULT_PAGE_SIZE)
+
+    # Add debug information to the response
+    render json: {
+      messages: @messages.as_json(message_includes),
+      pagination: {
+        current_page: @messages.current_page,
+        total_pages: @messages.total_pages,
+        total_count: @messages.total_count,
+        next_page: @messages.next_page,
+        prev_page: @messages.prev_page,
+        per_page: Pagination::DEFAULT_PAGE_SIZE,
+        actual_size: @messages.size # This will show us how many records are actually being returned
+      }
+    }
   end
 
   private
 
   def set_server
     @server = Server.find(params[:server_id])
-  end
-
-  def message_params
-    params.require(:message).permit(:content, :parent_message_id)
-  end
-
-  def can_modify_message?
-    unless @message.user_id == @current_user.id
-      render json: { message: "You don't have permission to modify this message" }, status: :unauthorized
-      return false
-    end
-    true
   end
 
   def is_member_of_server?
@@ -33,9 +40,4 @@ class MessagesController < ApplicationController
     end
     true
   end
-
-  def set_message
-    @message = Message.find(params[:id])
-  end
-
 end

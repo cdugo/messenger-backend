@@ -1,4 +1,5 @@
 class ServersController < ApplicationController
+  include MessageSerialization
   before_action :set_server, except: %i[ index create ]
   before_action :can_edit_server?, only: %i[ update destroy transfer_ownership ]
   before_action :is_member_of_server?, only: %i[ leave show]
@@ -12,7 +13,9 @@ class ServersController < ApplicationController
 
   # GET /servers/1
   def show
-    render json: @server, include: { users: {}, messages: { include: { user: {}, reactions: { include: { user: { only: :username } } } } } }
+    render json: @server.as_json.merge(
+      users: @server.users,
+    )
   end
 
   # POST /servers
