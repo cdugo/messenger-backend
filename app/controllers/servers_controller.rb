@@ -6,15 +6,30 @@ class ServersController < ApplicationController
   # GET /servers
   def index
     @servers = Server.all
-    
+    read_states = ServerReadState.where(user: @current_user, server: @servers)
+                                .index_by(&:server_id)
 
-    render json: @servers
+    render json: @servers.map { |server|
+      read_state = read_states[server.id]
+      server.as_json.merge(
+        read_state: {
+          last_read_at: read_state&.last_read_at,
+          unread_count: read_state&.unread_count || 0
+        }
+      )
+    }
   end
 
   # GET /servers/1
   def show
+    read_state = @server.server_read_states.find_by(user: @current_user)
+    
     render json: @server.as_json.merge(
       users: @server.users,
+      read_state: {
+        last_read_at: read_state&.last_read_at,
+        unread_count: read_state&.unread_count || 0
+      }
     )
   end
 
@@ -43,6 +58,7 @@ class ServersController < ApplicationController
   def join
     begin
       @server.users << @current_user
+      @server.create_read_state_for_user(@current_user)
       render json: @server, status: :created, include: :users
     rescue ActiveRecord::RecordNotUnique
       render json: { message: "You are already a member of this server" }, status: :unprocessable_entity

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_11_13_061234) do
+ActiveRecord::Schema[7.2].define(version: 2024_11_19_170050) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -46,6 +46,18 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_13_061234) do
     t.index ["user_id"], name: "index_server_members_on_user_id"
   end
 
+  create_table "server_read_states", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "server_id", null: false
+    t.datetime "last_read_at", null: false
+    t.integer "unread_count", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["server_id"], name: "index_server_read_states_on_server_id"
+    t.index ["user_id", "server_id"], name: "index_server_read_states_on_user_id_and_server_id", unique: true
+    t.index ["user_id"], name: "index_server_read_states_on_user_id"
+  end
+
   create_table "servers", force: :cascade do |t|
     t.string "name"
     t.text "description"
@@ -72,5 +84,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_13_061234) do
   add_foreign_key "messages", "users"
   add_foreign_key "server_members", "servers"
   add_foreign_key "server_members", "users"
+  add_foreign_key "server_read_states", "servers"
+  add_foreign_key "server_read_states", "users"
   add_foreign_key "servers", "users", column: "owner_id"
 end
