@@ -25,4 +25,6 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   # root "posts#index"
+
+  post 'rails/active_storage/direct_uploads', to: 'direct_uploads#create'
 end
