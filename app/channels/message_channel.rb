@@ -1,3 +1,5 @@
+require 'ostruct'
+
 class MessageChannel < ApplicationCable::Channel
     def subscribed
         begin

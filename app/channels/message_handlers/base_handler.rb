@@ -14,6 +14,13 @@ module MessageHandlers
 
     protected
 
+    def error_response(message)
+      broadcast(
+        type: 'error',
+        message: message
+      )
+    end
+
     def deliver_error_message(message, error_text = nil)
       broadcast(
         type: 'error',
