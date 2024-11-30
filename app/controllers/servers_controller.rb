@@ -5,13 +5,20 @@ class ServersController < ApplicationController
   before_action :is_member_of_server?, only: %i[ leave show]
   # GET /servers
   def index
-    @servers = Server.all
+    @servers = Server.all.includes(:users, :server_read_states)
     read_states = ServerReadState.where(user: @current_user, server: @servers)
                                 .index_by(&:server_id)
 
     render json: @servers.map { |server|
       read_state = read_states[server.id]
       server.as_json.merge(
+        users: server.users.map { |user| 
+          {
+            id: user.id,
+            username: user.username,
+            email: user.email
+          }
+        },
         read_state: {
           last_read_at: read_state&.last_read_at,
           unread_count: read_state&.unread_count || 0
@@ -40,7 +47,14 @@ class ServersController < ApplicationController
     @server.owner_id = @current_user.id
 
     if @server.save
-      render json: @server, status: :created, include: :users
+      read_state = @server.server_read_states.find_by(user: @current_user)
+      render json: @server.as_json.merge(
+        users: @server.users,
+        read_state: {
+          last_read_at: read_state&.last_read_at,
+          unread_count: read_state&.unread_count || 0
+        }
+      ), status: :created
     else
       render json: @server.errors, status: :unprocessable_entity
     end
@@ -59,7 +73,14 @@ class ServersController < ApplicationController
     begin
       @server.users << @current_user
       @server.create_read_state_for_user(@current_user)
-      render json: @server, status: :created, include: :users
+      read_state = @server.server_read_states.find_by(user: @current_user)
+      render json: @server.as_json.merge(
+        users: @server.users,
+        read_state: {
+          last_read_at: read_state&.last_read_at,
+          unread_count: read_state&.unread_count || 0
+        }
+      ), status: :created
     rescue ActiveRecord::RecordNotUnique
       render json: { message: "You are already a member of this server" }, status: :unprocessable_entity
     end
