@@ -30,8 +30,9 @@ module MessageHandlers
           type: 'reaction_delete', 
           message_id: reaction.message_id,
           reaction: {
-          id: reaction.id,
-            username: reaction.user.username
+            id: reaction.id,
+            username: reaction.user.username,
+            emoji: reaction.emoji
           }
         }
       )
