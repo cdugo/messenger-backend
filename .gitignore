@@ -33,3 +33,8 @@
 /config/master.key
 log/development.log
 app/.DS_Store
+
+
+# Ignore cursor rules
+.cursorrules
+log/development.log

@@ -3,6 +3,10 @@ class ServersController < ApplicationController
   before_action :set_server, except: %i[ index create ]
   before_action :can_edit_server?, only: %i[ update destroy transfer_ownership ]
   before_action :is_member_of_server?, only: %i[ leave show]
+
+  class NotServerMemberError < StandardError; end
+  class ServerOwnershipError < StandardError; end
+
   # GET /servers
   def index
     @servers = Server.all.includes(:users, :server_read_states)
@@ -56,7 +60,7 @@ class ServersController < ApplicationController
         }
       ), status: :created
     else
-      render json: @server.errors, status: :unprocessable_entity
+      raise ActiveRecord::RecordInvalid.new(@server)
     end
   end
 
@@ -65,33 +69,28 @@ class ServersController < ApplicationController
     if @server.update(server_params)
       render json: @server
     else
-      render json: @server.errors, status: :unprocessable_entity
+      raise ActiveRecord::RecordInvalid.new(@server)
     end
   end
 
   def join
-    begin
-      @server.users << @current_user
-      @server.create_read_state_for_user(@current_user)
-      read_state = @server.server_read_states.find_by(user: @current_user)
-      render json: @server.as_json.merge(
-        users: @server.users,
-        read_state: {
-          last_read_at: read_state&.last_read_at,
-          unread_count: read_state&.unread_count || 0
-        }
-      ), status: :created
-    rescue ActiveRecord::RecordNotUnique
-      render json: { message: "You are already a member of this server" }, status: :unprocessable_entity
-    end
+    @server.users << @current_user
+    @server.create_read_state_for_user(@current_user)
+    read_state = @server.server_read_states.find_by(user: @current_user)
+    render json: @server.as_json.merge(
+      users: @server.users,
+      read_state: {
+        last_read_at: read_state&.last_read_at,
+        unread_count: read_state&.unread_count || 0
+      }
+    ), status: :created
   end
 
   def leave
     if @server.owner_id == @current_user.id
-      render json: { message: "Cannot leave server that you own" }, status: :unauthorized
-
+      raise ServerOwnershipError, 'Cannot leave server that you own'
     elsif !@server.users.include?(@current_user)
-      render json: { message: "You are not a member of this server" }, status: :unauthorized
+      raise NotServerMemberError, 'You are not a member of this server'
     else
       @server.users.delete(@current_user)
       render json: @server, status: :ok, include: :users
@@ -102,13 +101,11 @@ class ServersController < ApplicationController
     new_owner = User.find(params[:owner_id])
     
     if !@server.users.include?(new_owner)
-      render json: { message: "User is not a member of this server" }, status: :unauthorized
+      raise NotServerMemberError, 'User is not a member of this server'
     else
-      @server.update(owner_id: new_owner.id)
+      @server.update!(owner_id: new_owner.id)
       render json: @server, status: :ok
     end
-  rescue ActiveRecord::RecordNotFound
-    render json: { message: "User not found" }, status: :not_found
   end
 
   # DELETE /servers/1
@@ -117,29 +114,33 @@ class ServersController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
     def set_server
       @server = Server.find(params[:id])
     end
 
-    # Only allow a list of trusted parameters through.
     def server_params
       params.require(:server).permit(:name, :description, :user_id, :owner_id)
     end
 
     def can_edit_server?
       unless @server.owner_id == @current_user.id
-        render json: { message: "You don't have permission to modify this server" }, status: :unauthorized
-        return false
+        raise ServerOwnershipError, "You don't have permission to modify this server"
       end
       true
     end
 
     def is_member_of_server?
       unless @server.users.include?(@current_user)
-        render json: { message: "You are not a member of this server" }, status: :unauthorized
-        return false
+        raise NotServerMemberError, 'You are not a member of this server'
       end
       true
+    end
+
+    rescue_from NotServerMemberError do |e|
+      respond_with_error(:unauthorized, 'Server Access Denied', e)
+    end
+
+    rescue_from ServerOwnershipError do |e|
+      respond_with_error(:unauthorized, 'Server Ownership Error', e)
     end
 end

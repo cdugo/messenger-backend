@@ -5,14 +5,12 @@ class MessagesController < ApplicationController
 
   # GET /servers/:server_id/messages
   def index
-
     @messages = @server.messages
                       .includes(:user, reactions: { user: {} })
                       .order(created_at: :desc)
                       .page(params[:page])
                       .per(Pagination::DEFAULT_PAGE_SIZE)
 
-    # Add debug information to the response
     render json: {
       messages: @messages.as_json(message_includes),
       pagination: {
@@ -22,7 +20,7 @@ class MessagesController < ApplicationController
         next_page: @messages.next_page,
         prev_page: @messages.prev_page,
         per_page: Pagination::DEFAULT_PAGE_SIZE,
-        actual_size: @messages.size # This will show us how many records are actually being returned
+        actual_size: @messages.size
       }
     }
   end
@@ -35,8 +33,7 @@ class MessagesController < ApplicationController
 
   def is_member_of_server?
     unless @server.users.include?(@current_user)
-      render json: { message: "You are not a member of this server" }, status: :unauthorized
-      return false
+      raise NotServerMemberError, 'You are not a member of this server'
     end
     true
   end

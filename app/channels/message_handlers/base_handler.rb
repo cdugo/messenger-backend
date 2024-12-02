@@ -1,5 +1,7 @@
 module MessageHandlers
   class BaseHandler
+    class MessageHandlerError < StandardError; end
+    
     attr_reader :data, :server, :current_user
 
     def initialize(data, server, current_user)
@@ -15,17 +17,13 @@ module MessageHandlers
     protected
 
     def error_response(message)
-      broadcast(
-        type: 'error',
-        message: message
-      )
+      broadcast_error('Error', message)
     end
 
     def deliver_error_message(message, error_text = nil)
-      broadcast(
-        type: 'error',
-        message: error_text || message.errors.full_messages.join(', ')
-      )
+      error_message = error_text || 
+        (message.respond_to?(:errors) ? message.errors.full_messages.join(', ') : message.to_s)
+      broadcast_error('Error', error_message)
     end
 
     def broadcast_message(message)
@@ -48,6 +46,15 @@ module MessageHandlers
 
     def broadcast(payload)
       ActionCable.server.broadcast("server_#{server.id}", payload)
+    end
+
+    def broadcast_error(error_type, message)
+      broadcast(
+        type: 'error',
+        error_type: error_type,
+        message: message,
+        timestamp: Time.current
+      )
     end
   end
 end 
