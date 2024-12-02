@@ -1,5 +1,7 @@
 module MessageHandlers
   class BaseHandler
+    include ActiveSupport::Rescuable
+    
     attr_reader :data, :server, :current_user
 
     def initialize(data, server, current_user)
