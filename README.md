@@ -1,24 +1,71 @@
-# README
+# Whop Messenger API
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+A real-time messaging API built with Ruby on Rails.
 
-Things you may want to cover:
+## Requirements
 
-* Ruby version
+- Ruby 3.x
+- PostgreSQL 13+
+- Redis 6+
+- AWS S3 account for file storage
 
-* System dependencies
+## Development Setup
 
-* Configuration
+1. Install dependencies:
 
-* Database creation
+```bash
+bundle install
+```
 
-* Database initialization
+2. Setup database:
 
-* How to run the test suite
+```bash
+rails db:create db:migrate
+```
 
-* Services (job queues, cache servers, search engines, etc.)
+3. Start the server:
 
-* Deployment instructions
+```bash
+rails s
+```
 
-* ...
+## Deployment Instructions
+
+1. Set up environment variables:
+
+   - Copy `.env.sample` to `.env`
+   - Fill in all required environment variables
+
+2. Configure your production database:
+
+   - Ensure PostgreSQL is properly configured
+   - Set `MESSENGER_DATABASE_PASSWORD` in your environment
+
+3. Configure Redis:
+
+   - Set up Redis server
+   - Set `REDIS_URL` in your environment
+
+4. Configure AWS S3:
+
+   - Create an S3 bucket
+   - Set up IAM user with appropriate permissions
+   - Configure AWS environment variables
+
+5. Configure Action Cable:
+
+   - Set up your WebSocket server
+   - Configure `ACTION_CABLE_URL` and `ALLOWED_ORIGINS`
+
+6. Deploy using your preferred hosting service (Heroku, AWS, etc.)
+
+## Security Notes
+
+- Never commit `.env` file to version control
+- Keep `master.key` secure and never share it
+- Use SSL in production
+- Configure CORS appropriately for your frontend domain
+
+## API Documentation
+
+[Add API documentation here]
