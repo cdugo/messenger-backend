@@ -32,13 +32,13 @@ Rails.application.configure do
   config.active_storage.service = :local
 
   # Set URL options for Active Storage
-  config.active_storage.default_url_options = { host: 'localhost:8080' }
+  config.active_storage.default_url_options = { host: ENV.fetch('HOST', 'localhost'), port: ENV.fetch('PORT', 8080) }
   
   # Set URL options for Action Controller
-  config.action_controller.default_url_options = { host: 'localhost:8080' }
+  config.action_controller.default_url_options = { host: ENV.fetch('HOST', 'localhost'), port: ENV.fetch('PORT', 8080) }
 
   # Set URL options for routes
-  Rails.application.routes.default_url_options = { host: 'localhost:8080' }
+  Rails.application.routes.default_url_options = { host: ENV.fetch('HOST', 'localhost'), port: ENV.fetch('PORT', 8080) }
 
   # Don't care if the mailer can't send.
   config.action_mailer.raise_delivery_errors = false
