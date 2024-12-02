@@ -29,6 +29,9 @@ gem "bootsnap", require: false
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin Ajax possible
 gem "rack-cors"
 
+# Add AWS SDK for S3 storage
+gem "aws-sdk-s3", require: false
+
 # Add Kaminari for pagination
 gem 'kaminari'
 
