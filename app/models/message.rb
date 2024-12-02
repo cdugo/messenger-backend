@@ -18,6 +18,7 @@ class Message < ApplicationRecord
   validate :acceptable_attachments
   validate :content_or_attachments_present
 
+  after_create_commit :broadcast_creation
   after_commit :increment_unread_counts, on: :create
 
   def attachment_urls
@@ -36,6 +37,25 @@ class Message < ApplicationRecord
   end
 
   private
+
+  def broadcast_creation
+    ActionCable.server.broadcast(
+      "server_#{server_id}",
+      {
+        type: 'message',
+        id: id,
+        content: content,
+        user_id: user_id,
+        server_id: server_id,
+        parent_message_id: parent_message_id,
+        created_at: created_at,
+        user: {
+          id: user.id,
+          username: user.username
+        }
+      }
+    )
+  end
 
   def parent_message_in_same_server
     if parent_message_id.present? && parent_message&.server_id != server_id

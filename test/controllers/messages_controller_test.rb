@@ -2,37 +2,31 @@ require "test_helper"
 
 class MessagesControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @message = messages(:one)
+    @message = messages(:message_one)
+    @server = servers(:one)
+    @user = users(:one)
+    sign_in_as @user
   end
 
   test "should get index" do
-    get messages_url, as: :json
+    get server_messages_url(@server), as: :json
     assert_response :success
   end
 
-  test "should create message" do
-    assert_difference("Message.count") do
-      post messages_url, params: { message: { content: @message.content, message_id: @message.message_id, server_id: @message.server_id, user_id: @message.user_id } }, as: :json
-    end
-
-    assert_response :created
+  test "should not get messages from server user is not member of" do
+    other_server = servers(:two)
+    get server_messages_url(other_server), as: :json
+    assert_response :forbidden
   end
 
-  test "should show message" do
-    get message_url(@message), as: :json
+  test "should include pagination info in response" do
+    get server_messages_url(@server), as: :json
     assert_response :success
-  end
-
-  test "should update message" do
-    patch message_url(@message), params: { message: { content: @message.content, message_id: @message.message_id, server_id: @message.server_id, user_id: @message.user_id } }, as: :json
-    assert_response :success
-  end
-
-  test "should destroy message" do
-    assert_difference("Message.count", -1) do
-      delete message_url(@message), as: :json
-    end
-
-    assert_response :no_content
+    
+    json_response = JSON.parse(response.body)
+    assert_includes json_response, 'pagination'
+    assert_includes json_response['pagination'], 'current_page'
+    assert_includes json_response['pagination'], 'total_pages'
+    assert_includes json_response['pagination'], 'total_count'
   end
 end

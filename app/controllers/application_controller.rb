@@ -1,11 +1,8 @@
-class ApplicationController < ActionController::Base
+class ApplicationController < ActionController::API
   include ErrorHandler
   
-  skip_before_action :verify_authenticity_token
   before_action :set_current_user
 
-  class AuthenticationError < StandardError; end
-  
   private
 
   def set_current_user
@@ -13,11 +10,6 @@ class ApplicationController < ActionController::Base
   end
 
   def authenticate_user
-    raise AuthenticationError, 'Not authorized' unless @current_user
-  end
-
-  # Add custom error handling for authentication
-  rescue_from AuthenticationError do |e|
-    respond_with_error(:unauthorized, 'Authentication required', e)
+    raise Errors::AuthenticationError, 'Not authorized' unless @current_user
   end
 end

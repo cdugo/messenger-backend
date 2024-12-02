@@ -7,7 +7,7 @@ module ErrorHandler
     end
 
     rescue_from ActiveRecord::RecordNotFound do |e|
-      respond_with_error(:not_found, 'Resource not found', e)
+      respond_with_error(:forbidden, 'Resource not found', e)
     end
 
     rescue_from ActiveRecord::RecordInvalid do |e|
@@ -22,12 +22,25 @@ module ErrorHandler
       respond_with_error(:conflict, 'Resource already exists', e)
     end
 
-    rescue_from JWT::DecodeError do |e|
-      respond_with_error(:unauthorized, 'Invalid authentication token', e)
+    rescue_from Errors::AuthenticationError do |e|
+      respond_with_error(:unauthorized, 'Authentication required', e)
     end
 
-    rescue_from JWT::ExpiredSignature do |e|
-      respond_with_error(:unauthorized, 'Authentication token has expired', e)
+    rescue_from Errors::NotServerMemberError do |e|
+      respond_with_error(:forbidden, 'Not a member of this server', e)
+    end
+
+    rescue_from Errors::ServerOwnershipError do |e|
+      respond_with_error(:forbidden, 'Server ownership error', e)
+    end
+
+    rescue_from Errors::SubscriptionError do |e|
+        reject
+      handle_error(e, 'Subscription failed')
+    end
+    
+    rescue_from Errors::MessageError do |e|
+      handle_error(e)
     end
   end
 

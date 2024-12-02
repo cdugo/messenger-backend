@@ -1,4 +1,6 @@
 class UsersController < ApplicationController
+  before_action :authenticate_user, only: [:show]
+
   def create
     user = User.new(user_params)
     if user.save
@@ -10,10 +12,6 @@ class UsersController < ApplicationController
   end
 
   def show
-    unless @current_user
-      raise AuthenticationError, 'Authentication required'
-    end
-
     read_states = ServerReadState.where(user: @current_user, server: @current_user.servers)
                                .index_by(&:server_id)
 

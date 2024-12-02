@@ -7,6 +7,8 @@ class Server < ApplicationRecord
   after_commit :create_read_state_for_owner, on: :create
 
   def create_read_state_for_user(user)
+    return if server_read_states.exists?(user: user)
+    
     server_read_states.create!(
       user: user,
       last_read_at: Time.current,
@@ -17,6 +19,7 @@ class Server < ApplicationRecord
   private
 
   def create_read_state_for_owner
-    create_read_state_for_user(users.first) # owner is always the first user
+    owner = User.find_by(id: owner_id)
+    create_read_state_for_user(owner) if owner
   end
 end

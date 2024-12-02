@@ -4,9 +4,6 @@ class ServersController < ApplicationController
   before_action :can_edit_server?, only: %i[ update destroy transfer_ownership ]
   before_action :is_member_of_server?, only: %i[ leave show]
 
-  class NotServerMemberError < StandardError; end
-  class ServerOwnershipError < StandardError; end
-
   # GET /servers
   def index
     @servers = Server.all.includes(:users, :server_read_states)
@@ -88,9 +85,9 @@ class ServersController < ApplicationController
 
   def leave
     if @server.owner_id == @current_user.id
-      raise ServerOwnershipError, 'Cannot leave server that you own'
+      raise Errors::ServerOwnershipError, 'Cannot leave server that you own'
     elsif !@server.users.include?(@current_user)
-      raise NotServerMemberError, 'You are not a member of this server'
+      raise Errors::NotServerMemberError, 'You are not a member of this server'
     else
       @server.users.delete(@current_user)
       render json: @server, status: :ok, include: :users
@@ -101,7 +98,7 @@ class ServersController < ApplicationController
     new_owner = User.find(params[:owner_id])
     
     if !@server.users.include?(new_owner)
-      raise NotServerMemberError, 'User is not a member of this server'
+      raise Errors::NotServerMemberError, 'User is not a member of this server'
     else
       @server.update!(owner_id: new_owner.id)
       render json: @server, status: :ok
@@ -124,23 +121,15 @@ class ServersController < ApplicationController
 
     def can_edit_server?
       unless @server.owner_id == @current_user.id
-        raise ServerOwnershipError, "You don't have permission to modify this server"
+        raise Errors::ServerOwnershipError, "You don't have permission to modify this server"
       end
       true
     end
 
     def is_member_of_server?
       unless @server.users.include?(@current_user)
-        raise NotServerMemberError, 'You are not a member of this server'
+        raise Errors::NotServerMemberError, 'You are not a member of this server'
       end
       true
-    end
-
-    rescue_from NotServerMemberError do |e|
-      respond_with_error(:unauthorized, 'Server Access Denied', e)
-    end
-
-    rescue_from ServerOwnershipError do |e|
-      respond_with_error(:unauthorized, 'Server Ownership Error', e)
     end
 end

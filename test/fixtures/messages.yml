@@ -1,13 +1,22 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-one:
+message_one:
+  id: 1
   content: MyText
-  user: one
-  server: one
-  message: one
+  user_id: 1 # user one
+  server_id: 1 # server one
+  parent_message_id: null
 
-two:
+message_two:
+  id: 2
   content: MyText
-  user: two
-  server: two
-  message: two
+  user_id: 2 # user two
+  server_id: 2 # server two
+  parent_message_id: 1 # references message_one
+
+message_three:
+  id: 3
+  content: MyText
+  user_id: 1 # user one
+  server_id: 1 # server one
+  parent_message_id: 1 # references message_one
