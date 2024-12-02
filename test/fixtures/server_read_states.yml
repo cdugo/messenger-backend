@@ -1,0 +1,27 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+# Read states for server one
+one_owner_state:
+  user_id: 1 # user one
+  server_id: 1 # server one
+  last_read_at: <%= Time.current %>
+  unread_count: 0
+
+two_member_state:
+  user_id: 2 # user two
+  server_id: 1 # server one
+  last_read_at: <%= Time.current %>
+  unread_count: 0
+
+# Read states for server two
+two_owner_state:
+  user_id: 2 # user two
+  server_id: 2 # server two
+  last_read_at: <%= Time.current %>
+  unread_count: 0
+
+one_member_state:
+  user_id: 1 # user one
+  server_id: 2 # server two
+  last_read_at: <%= Time.current %>
+  unread_count: 0

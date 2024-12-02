@@ -13,11 +13,11 @@ class Message < ApplicationRecord
   validates :user_id, presence: true
   validates :server_id, presence: true
   
-  validate :parent_message_in_same_server
-  validate :attachments_limit
-  validate :acceptable_attachments
+  validate :validate_parent_message
+  validate :validate_attachments
   validate :content_or_attachments_present
 
+  after_create_commit :broadcast_creation
   after_commit :increment_unread_counts, on: :create
 
   def attachment_urls
@@ -37,9 +37,44 @@ class Message < ApplicationRecord
 
   private
 
-  def parent_message_in_same_server
-    if parent_message_id.present? && parent_message&.server_id != server_id
-      errors.add(:parent_message_id, "must belong to the same server")
+  def broadcast_creation
+    ActionCable.server.broadcast(
+      "server_#{server_id}",
+      {
+        type: 'message',
+        id: id,
+        content: content,
+        user_id: user_id,
+        server_id: server_id,
+        parent_message_id: parent_message_id,
+        created_at: created_at,
+        user: {
+          id: user.id,
+          username: user.username
+        }
+      }
+    )
+  end
+
+  def validate_parent_message
+    if parent_message_id.present?
+      unless server.messages.exists?(parent_message_id)
+        errors.add(:parent_message_id, "must belong to the same server")
+      end
+    end
+  end
+
+  def validate_attachments
+    return unless attachments.attached?
+
+    attachments.each do |attachment|
+      unless attachment.content_type.in?(%w[image/jpeg image/png image/gif video/mp4 video/quicktime])
+        errors.add(:attachments, "must be an image or video file")
+      end
+      
+      if attachment.byte_size > 10.megabytes
+        errors.add(:attachments, "must be less than 10MB")
+      end
     end
   end
 
@@ -58,26 +93,6 @@ class Message < ApplicationRecord
       else
         # Increment unread count for non-subscribed users
         read_state.mark_as_unread!
-      end
-    end
-  end
-
-  def attachments_limit
-    return unless attachments.attached?
-    errors.add(:attachments, "too many files") if attachments.count > 10
-  end
-
-  def acceptable_attachments
-    return unless attachments.attached?
-
-    attachments.each do |attachment|
-      unless attachment.byte_size <= 10.megabytes
-        errors.add(:attachments, "file too large")
-      end
-
-      acceptable_types = ["image/jpeg", "image/png", "image/gif", "video/mp4", "video/quicktime"]
-      unless acceptable_types.include?(attachment.content_type)
-        errors.add(:attachments, "must be an image or video file")
       end
     end
   end

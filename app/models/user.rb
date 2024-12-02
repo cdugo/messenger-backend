@@ -1,7 +1,9 @@
 class User < ApplicationRecord
-  has_many :server_members
+  has_many :server_members, dependent: :destroy
   has_many :servers, through: :server_members
-  has_many :messages
+  has_many :messages, dependent: :destroy
+  has_many :server_read_states, dependent: :destroy
+  has_many :message_reactions, dependent: :destroy
 
   has_secure_password
 

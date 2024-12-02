@@ -1,6 +1,6 @@
 module MessageHandlers
   class BaseHandler
-    class MessageHandlerError < StandardError; end
+    include ActiveSupport::Rescuable
     
     attr_reader :data, :server, :current_user
 
@@ -55,6 +55,10 @@ module MessageHandlers
         message: message,
         timestamp: Time.current
       )
+    end
+
+    rescue_from Errors::MessageHandlerError do |e|
+      error_response(e.message)
     end
   end
 end 

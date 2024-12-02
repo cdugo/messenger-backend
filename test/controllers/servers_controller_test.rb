@@ -3,6 +3,8 @@ require "test_helper"
 class ServersControllerTest < ActionDispatch::IntegrationTest
   setup do
     @server = servers(:one)
+    @user = users(:one)
+    sign_in_as @user
   end
 
   test "should get index" do
@@ -12,7 +14,7 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
 
   test "should create server" do
     assert_difference("Server.count") do
-      post servers_url, params: { server: { description: @server.description, name: @server.name, user_id: @server.user_id } }, as: :json
+      post servers_url, params: { server: { description: @server.description, name: @server.name } }, as: :json
     end
 
     assert_response :created
@@ -24,7 +26,7 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should update server" do
-    patch server_url(@server), params: { server: { description: @server.description, name: @server.name, user_id: @server.user_id } }, as: :json
+    patch server_url(@server), params: { server: { description: @server.description, name: @server.name } }, as: :json
     assert_response :success
   end
 

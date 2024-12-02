@@ -5,34 +5,27 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     @user = users(:one)
   end
 
-  test "should get index" do
-    get users_url, as: :json
-    assert_response :success
-  end
-
   test "should create user" do
     assert_difference("User.count") do
-      post users_url, params: { user: { email: @user.email, is_active: @user.is_active, password: @user.password, username: @user.username } }, as: :json
+      post signup_url, params: { 
+        username: "newuser", 
+        email: "new@example.com",
+        password: "password123"
+      }, as: :json
     end
 
     assert_response :created
   end
 
-  test "should show user" do
-    get user_url(@user), as: :json
+  test "should show current user" do
+    sign_in_as @user
+    get me_url, as: :json
     assert_response :success
+    assert_equal @user.id, JSON.parse(response.body)["user"]["id"]
   end
 
-  test "should update user" do
-    patch user_url(@user), params: { user: { email: @user.email, is_active: @user.is_active, password: @user.password, username: @user.username } }, as: :json
-    assert_response :success
-  end
-
-  test "should destroy user" do
-    assert_difference("User.count", -1) do
-      delete user_url(@user), as: :json
-    end
-
-    assert_response :no_content
+  test "should not show user when not authenticated" do
+    get me_url, as: :json
+    assert_response :unauthorized
   end
 end

@@ -1,13 +1,10 @@
 require 'ostruct'
 
 class MessageChannel < ApplicationCable::Channel
-  class SubscriptionError < StandardError; end
-  class MessageError < StandardError; end
-
   def subscribed
     server = Server.find(params[:server_id])
     unless server.users.include?(current_user)
-      raise SubscriptionError, 'User not authorized for this server'
+      raise Errors::SubscriptionError, 'User not authorized for this server'
     end
 
     stream_name = "server_#{params[:server_id]}"
@@ -20,7 +17,7 @@ class MessageChannel < ApplicationCable::Channel
     
     transmit({ type: 'confirm_subscription', server_id: params[:server_id] })
   rescue ActiveRecord::RecordNotFound
-    raise SubscriptionError, 'Server not found'
+    raise Errors::SubscriptionError, 'Server not found'
   end
 
   def unsubscribed
@@ -57,23 +54,14 @@ class MessageChannel < ApplicationCable::Channel
     
     server = Server.includes(:users).find(parsed_data['server_id'])
     unless server.users.include?(current_user)
-      raise MessageError, 'User not authorized for this server'
+      raise Errors::MessageError, 'User not authorized for this server'
     end
 
     handler_class.new(parsed_data, server, current_user).call
 
   rescue JSON::ParserError
-    raise MessageError, 'Invalid message format'
+    raise Errors::MessageError, 'Invalid message format'
   rescue StandardError => e
-    raise MessageError, "Error processing message: #{e.message}"
-  end
-
-  rescue_from SubscriptionError do |e|
-    reject
-    handle_error(e, 'Subscription failed')
-  end
-
-  rescue_from MessageError do |e|
-    handle_error(e)
+    raise Errors::MessageError, "Error processing message: #{e.message}"
   end
 end

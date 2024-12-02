@@ -1,5 +1,6 @@
 class MessagesController < ApplicationController
   include MessageSerialization
+  before_action :authenticate_user
   before_action :set_server
   before_action :is_member_of_server?
 
@@ -33,7 +34,7 @@ class MessagesController < ApplicationController
 
   def is_member_of_server?
     unless @server.users.include?(@current_user)
-      raise NotServerMemberError, 'You are not a member of this server'
+      raise ::Errors::NotServerMemberError, 'You are not a member of this server'
     end
     true
   end
