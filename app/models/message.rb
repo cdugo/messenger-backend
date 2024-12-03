@@ -26,9 +26,9 @@ class Message < ApplicationRecord
     attachments.map do |attachment|
       {
         id: attachment.id,
-        url: rails_blob_url(attachment, host_options),
+        url: rails_blob_url(attachment, default_url_options),
         thumbnail_url: attachment.representable? ? 
-          rails_representation_url(attachment.representation(:thumb), host_options) : nil
+          rails_representation_url(attachment.representation(:thumb), default_url_options) : nil
       }
     end
   end
