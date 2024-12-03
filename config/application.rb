@@ -33,11 +33,21 @@ module Messenger
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
 
-    # Add this inside the Application class
+    # Add session middleware
     config.middleware.use ActionDispatch::Cookies
     config.middleware.use ActionDispatch::Session::CookieStore,
       key: 'message_app_session',
       same_site: :none,
-      secure: Rails.env.production?
+      secure: Rails.env.production?,
+      http_only: false # Allow JavaScript access
+      
+    # Configure CORS and cookie settings
+    config.action_dispatch.cookies_same_site_protection = :none
+    config.action_dispatch.cookies_serializer = :json
+    
+    # Add CORS headers for all responses
+    config.action_dispatch.default_headers = {
+      'Access-Control-Allow-Credentials' => 'true'
+    }
   end
 end
