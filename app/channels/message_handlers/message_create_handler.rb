@@ -1,6 +1,7 @@
 module MessageHandlers
   class MessageCreateHandler < BaseHandler
     include Rails.application.routes.url_helpers
+    include UrlOptions
 
     def call
       message = Message.new(
@@ -58,8 +59,6 @@ module MessageHandlers
     end
 
     def broadcast_message(message)
-      host_options = { host: 'localhost:8080' }
-
       ActionCable.server.broadcast(
         "server_#{message.server_id}",
         {
@@ -80,9 +79,9 @@ module MessageHandlers
               filename: attachment.filename.to_s,
               content_type: attachment.content_type,
               byte_size: attachment.byte_size,
-              url: rails_blob_url(attachment, host_options),
+              url: rails_blob_url(attachment, default_url_options),
               thumbnail_url: attachment.representable? ? 
-                rails_representation_url(attachment.representation(:thumb), host_options) : nil
+                rails_representation_url(attachment.representation(:thumb), default_url_options) : nil
             }
           }
         }

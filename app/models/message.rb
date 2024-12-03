@@ -1,5 +1,6 @@
 class Message < ApplicationRecord
   include Rails.application.routes.url_helpers
+  include UrlOptions
   
   belongs_to :user
   belongs_to :server
@@ -17,13 +18,10 @@ class Message < ApplicationRecord
   validate :validate_attachments
   validate :content_or_attachments_present
 
-  after_create_commit :broadcast_creation
   after_commit :increment_unread_counts, on: :create
 
   def attachment_urls
     return [] unless attachments.attached?
-
-    host_options = { host: 'localhost:8080' }
     
     attachments.map do |attachment|
       {
@@ -36,25 +34,6 @@ class Message < ApplicationRecord
   end
 
   private
-
-  def broadcast_creation
-    ActionCable.server.broadcast(
-      "server_#{server_id}",
-      {
-        type: 'message',
-        id: id,
-        content: content,
-        user_id: user_id,
-        server_id: server_id,
-        parent_message_id: parent_message_id,
-        created_at: created_at,
-        user: {
-          id: user.id,
-          username: user.username
-        }
-      }
-    )
-  end
 
   def validate_parent_message
     if parent_message_id.present?
