@@ -39,7 +39,8 @@ module Messenger
       key: 'message_app_session',
       same_site: :none,
       secure: Rails.env.production?,
-      http_only: false # Allow JavaScript access
+      http_only: false, # Allow JavaScript access
+      domain: :all # Allow cross-domain cookies
       
     # Configure CORS and cookie settings
     config.action_dispatch.cookies_same_site_protection = :none
