@@ -3,11 +3,7 @@ class MessageReaction < ApplicationRecord
   belongs_to :user
 
   validates :emoji, presence: true
-  validates :user_id, uniqueness: { scope: [:message_id, :emoji], 
-    message: "has already reacted with this emoji" }
 
-  VALID_EMOJIS = ['👍', '❤️', '😂', '😮', '😢', '😡']
-  validate :emoji_is_valid
 
   scope :for_message, ->(message) { where(message: message) }
   scope :by_user, ->(user) { where(user: user) }
@@ -17,10 +13,6 @@ class MessageReaction < ApplicationRecord
   after_destroy_commit :broadcast_deletion
 
   private
-
-  def emoji_is_valid
-    errors.add(:emoji, "is not a valid emoji") unless VALID_EMOJIS.include?(emoji)
-  end
 
   def broadcast_creation
     ActionCable.server.broadcast(
