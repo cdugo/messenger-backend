@@ -16,10 +16,6 @@ module Messenger
     # Common ones are `templates`, `generators`, or `middleware`, for example.
     config.autoload_lib(ignore: %w[assets tasks])
 
-    # Add custom error classes to autoload paths
-    config.autoload_paths += %W[#{config.root}/app/lib]
-    config.eager_load_paths += %W[#{config.root}/app/lib]
-
     # Configuration for the application, engines, and railties goes here.
     #
     # These settings can be overridden in specific environments using the files
@@ -33,22 +29,11 @@ module Messenger
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
 
-    # Add session middleware
+    # Add this inside the Application class
     config.middleware.use ActionDispatch::Cookies
     config.middleware.use ActionDispatch::Session::CookieStore,
       key: 'message_app_session',
       same_site: :none,
-      secure: Rails.env.production?,
-      http_only: false, # Allow JavaScript access
-      domain: :all # Allow cross-domain cookies
-      
-    # Configure CORS and cookie settings
-    config.action_dispatch.cookies_same_site_protection = :none
-    config.action_dispatch.cookies_serializer = :json
-    
-    # Add CORS headers for all responses
-    config.action_dispatch.default_headers = {
-      'Access-Control-Allow-Credentials' => 'true'
-    }
+      secure: Rails.env.production?
   end
 end
