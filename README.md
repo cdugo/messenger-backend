@@ -1,4 +1,4 @@
-# Whop Messenger API
+# Messenger API
 
 A real-time messaging API built with Ruby on Rails.
 
